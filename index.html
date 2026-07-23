@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>L'ÉLIXIR — Cinematic Culinary Art</title>
+  <title>L'ÉLIXIR — High-End WebGL Culinary Experience</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Plus+Jakarta+Sans:wght@200;300;400&display=swap" rel="stylesheet">
   
-  <!-- Lenis Smooth Scroll CSS -->
+  <!-- Lenis CSS -->
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.9/dist/lenis.css">
 
   <style>
     :root {
-      --bg-dark: #0a0a0c;
-      --gold-accent: #d4af37;
-      --text-main: #f4f4f6;
-      --text-muted: #8e8e93;
+      --bg: #050507;
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --text: #f8f8fa;
+      --text-muted: #7e7e8c;
       --font-serif: 'Cinzel', serif;
       --font-sans: 'Plus Jakarta Sans', sans-serif;
     }
@@ -30,30 +31,40 @@
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
+      background-color: var(--bg);
+      color: var(--text);
       font-family: var(--font-sans);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient Spotlight Follower */
-    .mouse-spotlight {
+    /* WebGL Canvas Background */
+    #webgl-canvas {
       position: fixed;
       top: 0;
       left: 0;
-      width: 600px;
-      height: 600px;
-      margin-left: -300px;
-      margin-top: -300px;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
       pointer-events: none;
-      z-index: 99;
-      border-radius: 50%;
-      transition: transform 0.15s ease-out;
     }
 
-    /* Navigation Header */
+    /* Ambient Cursor Glow */
+    .cursor-light {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 500px;
+      height: 500px;
+      margin-left: -250px;
+      margin-top: -250px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 2;
+      border-radius: 50%;
+    }
+
+    /* Luxury Header */
     header {
       position: fixed;
       top: 0;
@@ -69,206 +80,183 @@
 
     .brand {
       font-family: var(--font-serif);
-      font-size: 1.5rem;
-      letter-spacing: 0.35em;
+      font-size: 1.4rem;
+      letter-spacing: 0.4em;
       font-weight: 700;
-      text-transform: uppercase;
       color: #fff;
     }
 
-    .nav-tag {
-      font-size: 0.75rem;
-      letter-spacing: 0.25em;
+    .tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
       text-transform: uppercase;
-      color: var(--gold-accent);
+      color: var(--gold);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
     }
 
-    /* Fullscreen Sections */
+    /* Fullscreen Floating Sections */
     section {
       position: relative;
       width: 100vw;
       height: 100vh;
-      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .bg-image-wrapper {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      will-change: transform, filter;
-    }
-
-    .bg-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scale(1.1);
-      filter: brightness(0.65) contrast(1.1);
-    }
-
-    /* Gradient Overlays for Cinematic Depth */
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(10, 10, 12, 0.2) 0%, rgba(10, 10, 12, 0.85) 100%);
-      z-index: 2;
-    }
-
-    .content-container {
-      position: relative;
       z-index: 10;
-      max-width: 900px;
+      pointer-events: none;
+    }
+
+    .content {
+      max-width: 800px;
       padding: 0 2rem;
       text-align: center;
+      pointer-events: auto;
     }
 
-    .step-number {
+    .chapter {
       font-family: var(--font-serif);
-      color: var(--gold-accent);
-      font-size: 1rem;
-      letter-spacing: 0.4em;
-      margin-bottom: 1rem;
+      color: var(--gold);
+      font-size: 0.85rem;
+      letter-spacing: 0.5em;
+      margin-bottom: 1.5rem;
       text-transform: uppercase;
       display: block;
     }
 
     h1, h2 {
       font-family: var(--font-serif);
-      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-size: clamp(2.8rem, 6vw, 5.5rem);
       font-weight: 400;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 1.5rem;
-      text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.8rem;
+      background: linear-gradient(180deg, #ffffff 0%, #a0a0b0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     p {
-      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      font-size: clamp(1rem, 1.4vw, 1.2rem);
       color: var(--text-muted);
-      line-height: 1.7;
-      max-width: 650px;
+      line-height: 1.8;
+      max-width: 600px;
       margin: 0 auto;
       font-weight: 300;
     }
 
-    /* Scroll Indicator for Hero */
-    .scroll-indicator {
+    /* Subtle Glass Card Overlay */
+    .glass-panel {
+      background: rgba(10, 10, 15, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 4rem 3rem;
+      border-radius: 24px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .scroll-hint {
       position: absolute;
-      bottom: 3rem;
+      bottom: 2.5rem;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
-      opacity: 0.7;
+      gap: 0.8rem;
     }
 
-    .scroll-indicator span {
-      font-size: 0.65rem;
-      letter-spacing: 0.3em;
+    .scroll-hint span {
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
       text-transform: uppercase;
+      color: var(--gold);
     }
 
     .line {
       width: 1px;
-      height: 40px;
-      background: linear-gradient(to bottom, var(--gold-accent), transparent);
-      animation: pulseLine 2s infinite ease-in-out;
+      height: 45px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: linePulse 2s infinite ease-in-out;
     }
 
-    @keyframes pulseLine {
+    @keyframes linePulse {
       0%, 100% { transform: scaleY(1); opacity: 1; }
-      50% { transform: scaleY(0.4); opacity: 0.3; }
+      50% { transform: scaleY(0.3); opacity: 0.2; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Mouse Tracking Light -->
-  <div class="mouse-spotlight" id="spotlight"></div>
+  <!-- WebGL 3D Canvas -->
+  <canvas id="webgl-canvas"></canvas>
 
-  <!-- Header -->
+  <!-- Ambient Cursor -->
+  <div class="cursor-light" id="cursorLight"></div>
+
   <header>
     <div class="brand">L'ÉLIXIR</div>
-    <div class="nav-tag">Private Dining</div>
+    <div class="tag">Three.js WebGL</div>
   </header>
 
   <main>
-    <!-- Section 1: Hero (Ingredients) -->
+    <!-- Section 1: Hero -->
     <section id="hero">
-      <div class="bg-image-wrapper">
-        <img class="bg-image" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=2000" alt="Wagyu & Truffle Ingredients">
+      <div class="content glass-panel">
+        <span class="chapter">Chapter I — Selection</span>
+        <h1 class="title">Elemental Essence</h1>
+        <p class="desc">A quiet composition of A5 Wagyu, winter white truffles, and rare coastal minerals—curated for those who seek culinary transcendence.</p>
       </div>
-      <div class="overlay"></div>
-      <div class="content-container">
-        <span class="step-number">Chapter I</span>
-        <h1 class="anim-title">Rare Ingredients</h1>
-        <p class="anim-text">A harmonious symphony of A5 Miyazaki Wagyu, white winter truffles, and hand-harvested sea salt—sourced exclusively for a singular moment in tasting.</p>
-      </div>
-      <div class="scroll-indicator">
-        <span>Scroll</span>
+      <div class="scroll-hint">
+        <span>Scroll Experience</span>
         <div class="line"></div>
       </div>
     </section>
 
     <!-- Section 2: Preparation -->
-    <section id="preparation">
-      <div class="bg-image-wrapper">
-        <img class="bg-image" src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&q=80&w=2000" alt="Culinary Preparation">
-      </div>
-      <div class="overlay"></div>
-      <div class="content-container">
-        <span class="step-number">Chapter II</span>
-        <h1 class="anim-title">Precision Preparation</h1>
-        <p class="anim-text">Mastery in technique. Every slice is calculated down to the millimeter, respecting the structural integrity and marbling of every unique cut.</p>
+    <section id="prep">
+      <div class="content glass-panel">
+        <span class="chapter">Chapter II — Craft</span>
+        <h1 class="title">Surgical Precision</h1>
+        <p class="desc">Every cut is guided by geometry and absolute mastery. Honoring texture, moisture, and time down to the exact second.</p>
       </div>
     </section>
 
     <!-- Section 3: Cooking -->
-    <section id="cooking">
-      <div class="bg-image-wrapper">
-        <img class="bg-image" src="https://images.unsplash.com/photo-1507048331197-7d4ac70811cf?auto=format&fit=crop&q=80&w=2000" alt="Cooking over Flame">
-      </div>
-      <div class="overlay"></div>
-      <div class="content-container">
-        <span class="step-number">Chapter III</span>
-        <h1 class="anim-title">Element of Fire</h1>
-        <p class="anim-text">Seared over Japanese Binchotan charcoal at 1,000°C to lock in intense umami, infusing a delicate kiss of oak smoke into every fiber.</p>
+    <section id="fire">
+      <div class="content glass-panel">
+        <span class="chapter">Chapter III — Flame</span>
+        <h1 class="title">Binchotan Heat</h1>
+        <p class="desc">Seared over smokeless white oak charcoal at 1,000°C. Capturing smoky nuance while preserving tender, melt-in-mouth richness.</p>
       </div>
     </section>
 
     <!-- Section 4: Serving -->
-    <section id="serving">
-      <div class="bg-image-wrapper">
-        <img class="bg-image" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=2000" alt="Luxury Plating">
-      </div>
-      <div class="overlay"></div>
-      <div class="content-container">
-        <span class="step-number">Chapter IV</span>
-        <h1 class="anim-title">The Grand Presentation</h1>
-        <p class="anim-text">Plated on custom volcanic stone porcelain and finished with a reduction of 25-year aged balsamic. Artistry crafted purely to be remembered.</p>
+    <section id="serve">
+      <div class="content glass-panel">
+        <span class="chapter">Chapter IV — Artistry</span>
+        <h1 class="title">The Final Canvas</h1>
+        <p class="desc">Plated upon hand-carved basalt stone. Finished with 25-year aged balsamico and gold leaf—a masterpiece meant to vanish.</p>
       </div>
     </section>
   </main>
 
-  <!-- GSAP & Plugins -->
+  <!-- External Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <!-- Lenis for Smooth Inertial Scrolling -->
   <script src="https://unpkg.com/lenis@1.1.9/dist/lenis.min.js"></script>
 
   <script>
-    // Initialize Lenis Smooth Scroll
+    // --------------------------------------------------
+    // 1. Lenis Smooth Scroll Setup
+    // --------------------------------------------------
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.4,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true
     });
@@ -279,88 +267,157 @@
     }
     requestAnimationFrame(raf);
 
-    // Sync Lenis with GSAP ScrollTrigger
+    // Sync GSAP ScrollTrigger with Lenis
     lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0, 0);
 
-    // Mouse Movement Spotlight & Parallax Tilt
-    const spotlight = document.getElementById('spotlight');
+    // --------------------------------------------------
+    // 2. Three.js 3D WebGL Scene Setup
+    // --------------------------------------------------
+    const canvas = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 7);
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xd4af37, 3, 20);
+    pointLight.position.set(2, 3, 4);
+    scene.add(pointLight);
+
+    // 3D Objects: Floating Luxury Sphere Core + Floating Particles
+    const geometry = new THREE.IcosahedronGeometry(1.8, 4);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x111116,
+      roughness: 0.15,
+      metalness: 0.9,
+      wireframe: true
+    });
+    const coreMesh = new THREE.Mesh(geometry, material);
+    scene.add(coreMesh);
+
+    // Particles Cloud (3D Gold Dust)
+    const particlesCount = 1200;
+    const posArray = new Float32Array(particlesCount * 3);
+
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 15;
+    }
+
+    const particlesGeometry = new THREE.BufferGeometry();
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.025,
+      color: 0xd4af37,
+      transparent: true,
+      opacity: 0.8
+    });
+
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
+
+    // Mouse Interaction
     let mouseX = 0, mouseY = 0;
+    const cursorLight = document.getElementById('cursorLight');
 
     window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
 
-      gsap.to(spotlight, {
-        x: mouseX,
-        y: mouseY,
-        duration: 0.6,
-        ease: 'power2.out'
+      gsap.to(cursorLight, {
+        x: e.clientX,
+        y: e.clientY,
+        duration: 0.5
       });
     });
 
-    // Register ScrollTrigger Plugin
+    // Render Loop
+    const clock = new THREE.Clock();
+
+    function tick() {
+      const elapsedTime = clock.getElapsedTime();
+
+      // Continuous rotation
+      coreMesh.rotation.y = elapsedTime * 0.15;
+      coreMesh.rotation.x = elapsedTime * 0.08;
+      particlesMesh.rotation.y = -elapsedTime * 0.05;
+
+      // Gentle Mouse Parallax Effect on Camera
+      camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+      camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // Responsive Canvas Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // --------------------------------------------------
+    // 3. GSAP ScrollTrigger Animations (Camera & 3D Morph)
+    // --------------------------------------------------
     gsap.registerPlugin(ScrollTrigger);
 
-    // Animate Each Fullscreen Section on Scroll
     const sections = document.querySelectorAll('section');
 
-    sections.forEach((section) => {
-      const bgImage = section.querySelector('.bg-image');
-      const title = section.querySelector('.anim-title');
-      const text = section.querySelector('.anim-text');
-      const step = section.querySelector('.step-number');
+    sections.forEach((sec, idx) => {
+      const card = sec.querySelector('.glass-panel');
+      const title = sec.querySelector('.title');
+      const desc = sec.querySelector('.desc');
+      const chapter = sec.querySelector('.chapter');
 
-      // Timeline for visual transitions (Zoom, Blur, Text Slide)
+      // Scroll Timeline for Each Section
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: section,
+          trigger: sec,
           start: 'top top',
           end: '+=100%',
-          scrub: true,
-          pin: true,
-          anticipatePin: 1
+          scrub: 1,
+          pin: true
         }
       });
 
-      // 1. Entrance Animations (Scale In & Blur Out)
-      tl.fromTo(bgImage, 
-        { scale: 1.3, filter: 'brightness(0.2) blur(10px)' },
-        { scale: 1.0, filter: 'brightness(0.65) blur(0px)', ease: 'none', duration: 0.4 }
+      // Text Entry Sequence
+      tl.fromTo([chapter, title, desc], 
+        { opacity: 0, y: 50, filter: 'blur(10px)' },
+        { opacity: 1, y: 0, filter: 'blur(0px)', stagger: 0.1, duration: 0.5 }
       )
-      .fromTo(step,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.2 },
-        '-=0.2'
-      )
-      .fromTo(title,
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, duration: 0.3 },
-        '-=0.1'
-      )
-      .fromTo(text,
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.3 },
-        '-=0.2'
-      )
-      
-      // 2. Hold state in center
-      .to({}, { duration: 0.4 })
+      .to({}, { duration: 0.5 }) // Pause state in center
+      .to([chapter, title, desc], { opacity: 0, y: -50, filter: 'blur(10px)', duration: 0.4 });
 
-      // 3. Exit Animations (Zoom out & Fade out)
-      .to([title, text, step], {
-        opacity: 0,
-        y: -40,
-        duration: 0.3
-      })
-      .to(bgImage, {
-        scale: 1.15,
-        filter: 'brightness(0.2) blur(8px)',
-        duration: 0.4
-      }, '-=0.3');
+      // 3D Camera & Model Transitions per Section
+      if (idx === 0) {
+        // Section 1 -> 2
+        tl.to(coreMesh.scale, { x: 1.4, y: 1.4, z: 1.4 }, 0)
+          .to(coreMesh.rotation, { z: Math.PI * 0.5 }, 0);
+      } else if (idx === 1) {
+        // Section 2 -> 3
+        tl.to(coreMesh.scale, { x: 0.8, y: 0.8, z: 0.8 }, 0)
+          .to(material, { wireframe: false, roughness: 0.3 }, 0)
+          .to(pointLight.color, { r: 1, g: 0.4, b: 0.1 }, 0); // Warm Fire Tone
+      } else if (idx === 2) {
+        // Section 3 -> 4
+        tl.to(coreMesh.scale, { x: 1.2, y: 1.2, z: 1.2 }, 0)
+          .to(material, { wireframe: true }, 0)
+          .to(pointLight.color, { r: 0.83, g: 0.68, b: 0.21 }, 0); // Back to Gold
+      }
     });
   </script>
 </body>
