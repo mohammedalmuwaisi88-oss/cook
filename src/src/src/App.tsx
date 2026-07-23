@@ -14,7 +14,6 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [maskDataUrl, setMaskDataUrl] = useState<string>('');
 
-  // Refs for animation & positioning
   const heroRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mousePos = useRef({ x: -1000, y: -1000 });
@@ -46,18 +45,17 @@ export default function App() {
   // Canvas Spotlight Radial Mask & Grid Parallax Loop
   useEffect(() => {
     let animFrameId: number;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set canvas dimensions matching hero size
     const updateCanvasSize = () => {
-      if (heroRef.current) {
+      if (heroRef.current && canvas) {
         const rect = heroRef.current.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+        canvas.width = rect.width || window.innerWidth;
+        canvas.height = rect.height || window.innerHeight;
       }
     };
+
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize);
 
@@ -73,8 +71,8 @@ export default function App() {
         const rect = heroRef.current.getBoundingClientRect();
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const targetOffsetX = ((smoothPos.current.x - centerX) / rect.width) * 16;
-        const targetOffsetY = ((smoothPos.current.y - centerY) / rect.height) * 16;
+        const targetOffsetX = ((smoothPos.current.x - centerX) / (rect.width || 1)) * 16;
+        const targetOffsetY = ((smoothPos.current.y - centerY) / (rect.height || 1)) * 16;
 
         setGridOffset((prev) => ({
           x: prev.x + (targetOffsetX - prev.x) * 0.06,
@@ -83,7 +81,7 @@ export default function App() {
       }
 
       // Draw Radial Gradient Mask on Offscreen Canvas
-      if (ctx) {
+      if (ctx && canvas.width > 0 && canvas.height > 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         const radius = 260;
@@ -96,7 +94,6 @@ export default function App() {
           radius
         );
 
-        // Mask gradient stops: 0-40% white, 60% 0.75, 75% 0.4, 88% 0.12, 100% 0
         gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
         gradient.addColorStop(0.4, 'rgba(255, 255, 255, 1)');
         gradient.addColorStop(0.6, 'rgba(255, 255, 255, 0.75)');
@@ -109,7 +106,11 @@ export default function App() {
         ctx.arc(smoothPos.current.x, smoothPos.current.y, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        setMaskDataUrl(canvas.toDataURL());
+        try {
+          setMaskDataUrl(canvas.toDataURL());
+        } catch {
+          // Fallback if canvas is clean
+        }
       }
 
       animFrameId = requestAnimationFrame(render);
@@ -124,8 +125,8 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-white select-none">
-      {/* Hidden Offscreen Canvas for dynamic mask generation */}
+    <div className="relative w-full h-screen overflow-hidden bg-black select-none">
+      {/* Hidden Offscreen Canvas */}
       <canvas ref={canvasRef} className="hidden" />
 
       {/* ------------------------------------------------------------- */}
@@ -186,18 +187,14 @@ export default function App() {
       {/* MOBILE FULLSCREEN MENU (z-55) */}
       {/* ------------------------------------------------------------- */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[55] bg-[#0a0a0a] flex flex-col justify-between p-8 md:hidden text-white animate-fade-in">
-          {/* Menu Top Bar with Close Button */}
+        <div className="fixed inset-0 z-[55] bg-[#0a0a0a] flex flex-col justify-between p-8 md:hidden text-white">
           <div className="flex justify-between items-center">
             <svg width="28" height="28" viewBox="0 0 256 256" fill="white">
               <path d="M 256 64 L 256 128 L 192.5 128 L 160 95 L 128 64 L 96 95 L 63.5 128 L 64 128 L 128 192 L 128 256 L 64.5 256 L 32 223 L 0 192 L 0 64 L 64 0 L 192 0 Z M 256 192 L 256 256 L 192.5 256 L 160 223 L 128 192 L 128 128 L 192 128 Z" />
             </svg>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="liquid-glass rounded-full w-12 h-12 flex items-center justify-center transition-transform duration-300 transform active:scale-90"
-              style={{
-                transitionTimingFunction: 'cubic-bezier(0.77, 0, 0.18, 1)',
-              }}
+              className="liquid-glass rounded-full w-12 h-12 flex items-center justify-center transition-transform duration-300 active:scale-90"
               aria-label="Close menu"
             >
               <div className="relative w-5 h-5 flex items-center justify-center">
@@ -207,7 +204,6 @@ export default function App() {
             </button>
           </div>
 
-          {/* Staggered Vertical Menu Items */}
           <div className="flex flex-col items-center justify-center gap-6 my-auto">
             {NAV_ITEMS.map((item, index) => (
               <a
@@ -225,7 +221,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Bottom Reserve CTA */}
           <div
             className="flex justify-center w-full animate-menu-item"
             style={{ animationDelay: `${100 + NAV_ITEMS.length * 60}ms`, opacity: 0 }}
@@ -249,7 +244,7 @@ export default function App() {
         onMouseMove={handleMouseMove}
         className="font-helvetica-neue relative w-full h-screen overflow-hidden bg-black select-none"
       >
-        {/* LAYER 1: SVG Grid Pattern with Parallax Shift (z-0) */}
+        {/* LAYER 1: SVG Grid Pattern with Parallax Shift */}
         <div
           className="absolute inset-0 pointer-events-none z-0 opacity-10 transition-transform duration-75 ease-out"
           style={{
@@ -276,28 +271,27 @@ export default function App() {
           </svg>
         </div>
 
-        {/* LAYER 2: Background Image (z-10) */}
+        {/* LAYER 2: Background Image */}
         <div
           className="absolute inset-0 z-10 bg-center bg-cover bg-no-repeat pointer-events-none"
           style={{ backgroundImage: `url("${BG_IMAGE_1}")` }}
         />
 
-        {/* LAYER 3: Hero Title Header (z-20) */}
+        {/* LAYER 3: Hero Title Header */}
         <div className="absolute inset-x-0 top-20 sm:top-28 md:top-32 z-20 flex justify-center pointer-events-none">
-          <h1 className="font-instrument uppercase text-white leading-[0.9] text-center tracking-tight text-[4.5rem] xs:text-[5.5rem] sm:text-[10rem] md:text-[13rem] lg:text-[16rem] drop-shadow-2xl">
+          <h1 className="font-instrument uppercase text-white leading-[0.9] text-center tracking-tight text-[4rem] sm:text-[9rem] md:text-[12rem] lg:text-[15rem] drop-shadow-2xl">
             Measured
           </h1>
         </div>
 
-        {/* LAYER 4: Atmosphere Overlay Image (z-25) */}
+        {/* LAYER 4: Atmosphere Overlay Image */}
         <img
           src={OVERLAY_IMAGE}
           alt=""
           className="absolute inset-0 z-25 w-full h-full object-cover pointer-events-none mix-blend-screen opacity-90"
         />
 
-        {/* LAYER 5: Spotlight Reveal Video (z-30) */}
-        {/* clipped to bottom 60% of viewport with canvas radial reveal mask */}
+        {/* LAYER 5: Spotlight Reveal Video */}
         <div
           className="absolute inset-0 z-30 pointer-events-none"
           style={{
